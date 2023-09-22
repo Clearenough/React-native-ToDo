@@ -1,12 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-
-interface Task {
-  id: number;
-  text: string;
-  isCompleted: boolean;
-}
-
-type TasksState = Array<Task>;
+import {Task, TasksState} from '../../types/common';
 
 const initialState: TasksState = [];
 

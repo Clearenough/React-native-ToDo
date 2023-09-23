@@ -1,23 +1,19 @@
 import React from 'react';
 import {useState} from 'react';
 import {Pressable, StyleSheet, TextInput, View} from 'react-native';
-import {nanoid} from '@reduxjs/toolkit';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {useAppDispatch} from '../../hooks/hooks';
-import {addTask} from '../../store/slices/tasksSlice';
-import {ITask} from '../../types/common';
+// import {ITask} from '../../types/common';
 
-function CreateTask() {
+interface TaskFormProps {
+  handler: (item: string) => void;
+}
+
+function TaskForm({handler}: TaskFormProps) {
   const [text, setText] = useState('');
-  const dispatch = useAppDispatch();
 
   function onPress() {
-    const newTask: ITask = {
-      id: nanoid(),
-      text,
-      isCompleted: false,
-    };
-    dispatch(addTask(newTask));
+    handler(text);
+    setText('');
   }
 
   return (
@@ -41,4 +37,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateTask;
+export default TaskForm;

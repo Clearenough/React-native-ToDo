@@ -2,6 +2,7 @@ import React from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider} from 'react-redux';
+import CreateTask from './src/components/CreateTask';
 import Tasks from './src/components/Tasks';
 import {store} from './src/store/store';
 
@@ -10,6 +11,7 @@ function App(): JSX.Element {
     <GestureHandlerRootView style={styles.container}>
       <Provider store={store}>
         <SafeAreaView style={styles.container}>
+          <CreateTask />
           <Tasks />
         </SafeAreaView>
       </Provider>

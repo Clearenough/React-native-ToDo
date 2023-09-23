@@ -1,24 +1,28 @@
 import React from 'react';
-import {View, Text, Pressable} from 'react-native';
-import {Swipeable} from 'react-native-gesture-handler';
-import {Task} from '../../types/common';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {View, Text, Pressable, StyleSheet} from 'react-native';
+// import {Swipeable} from 'react-native-gesture-handler';
+import {ITask} from '../../types/common';
+import Icon from 'react-native-vector-icons/Feather';
 
 interface TaskProps {
-  task: Task;
+  task: ITask;
 }
 
 function Task({task}: TaskProps) {
   return (
-    <Swipeable>
-      <View>
-        <Text>{task.text}</Text>
-        <Pressable>
-          <Icon name="pencil" />
-        </Pressable>
-      </View>
-    </Swipeable>
+    <View style={styles.container}>
+      <Text>{task.text}</Text>
+      <Pressable onPress={() => console.log(task)}>
+        <Icon name="edit-2" />
+      </Pressable>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default Task;

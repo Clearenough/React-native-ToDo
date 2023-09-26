@@ -5,6 +5,7 @@ import {Provider} from 'react-redux';
 import Header from './src/components/Header';
 import Tasks from './src/components/Tasks';
 import {store} from './src/store/store';
+import 'react-native-gesture-handler';
 
 function App(): JSX.Element {
   return (

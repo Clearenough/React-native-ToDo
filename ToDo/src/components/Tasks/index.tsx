@@ -1,6 +1,12 @@
 import React from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
-import {Swipeable} from 'react-native-gesture-handler';
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
+import {ScrollView, Swipeable} from 'react-native-gesture-handler';
 import {useAppDispatch, useAppSelector} from '../../hooks/hooks';
 import {deleteTask} from '../../store/slices/tasksSlice';
 import {ITask} from '../../types/common';
@@ -12,7 +18,15 @@ function Tasks() {
 
   return (
     <View style={styles.container}>
-      <FlatList data={tasks} renderItem={task => <Task task={task.item} />} />
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+        behavior="position">
+        <FlatList
+          data={tasks}
+          renderItem={task => <Task task={task.item} />}
+          scrollEnabled={true}
+        />
+      </KeyboardAvoidingView>
     </View>
   );
 }

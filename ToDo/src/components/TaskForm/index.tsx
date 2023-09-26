@@ -28,6 +28,7 @@ function TaskForm({handler, inputText}: TaskFormProps) {
         onChangeText={newText => setText(newText)}
         defaultValue={text}
         style={styles.input}
+        keyboardType="ascii-capable"
       />
       <Pressable onPress={onPress}>
         <Icon name="plus" size={16} />

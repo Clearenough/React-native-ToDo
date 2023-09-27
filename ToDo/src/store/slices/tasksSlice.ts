@@ -32,7 +32,7 @@ export const tasksSlice = createSlice({
       const id = action.payload;
       const completedTask = state.find(task => task.id === id);
       if (completedTask) {
-        completedTask.isCompleted = true;
+        completedTask.isCompleted = !completedTask.isCompleted;
       }
     },
   },

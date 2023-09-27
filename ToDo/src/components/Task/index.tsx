@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
 import {View, Text, Pressable, StyleSheet} from 'react-native';
-// import {Swipeable} from 'react-native-gesture-handler';
 import {ITask} from '../../types/common';
 import Icon from 'react-native-vector-icons/Feather';
-import {useAppDispatch, useAppSelector} from '../../hooks/hooks';
-import {deleteTask, updateTask} from '../../store/slices/tasksSlice';
+import {useAppDispatch} from '../../hooks/hooks';
+import {
+  completeTask,
+  deleteTask,
+  updateTask,
+} from '../../store/slices/tasksSlice';
 import TaskForm from '../TaskForm';
 import {
   PanGestureHandler,
@@ -34,8 +37,16 @@ function Task({task}: TaskProps) {
   const marginVertical = useSharedValue(10);
   const opacity = useSharedValue(1);
 
+  const textStyles = !task.isCompleted
+    ? styles.text
+    : [styles.text, styles.completedText];
+
   function onDelete() {
     dispatch(deleteTask(task.id));
+  }
+
+  function onComplete() {
+    dispatch(completeTask(task.id));
   }
 
   const panGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
@@ -43,16 +54,27 @@ function Task({task}: TaskProps) {
       translateX.value = event.translationX;
     },
     onEnd: event => {
-      if (-event.translationX > windowWidth * 0.3) {
-        translateX.value = withTiming(-windowWidth);
-        height.value = withTiming(0);
-        marginVertical.value = withTiming(0);
-        opacity.value = withTiming(0, undefined, isFinished => {
-          if (isFinished) {
-            runOnJS(onDelete)();
-          }
-        });
+      if (event.translationX < 0) {
+        if (-event.translationX > windowWidth * 0.3) {
+          translateX.value = withTiming(-windowWidth);
+          height.value = withTiming(0);
+          marginVertical.value = withTiming(0);
+          opacity.value = withTiming(0, undefined, isFinished => {
+            if (isFinished) {
+              runOnJS(onDelete)();
+            }
+          });
+        } else {
+          translateX.value = withTiming(0);
+        }
       } else {
+        if (event.translationX > windowWidth * 0.3) {
+          opacity.value = withTiming(0, undefined, isFinished => {
+            if (isFinished) {
+              runOnJS(onComplete)();
+            }
+          });
+        }
         translateX.value = withTiming(0);
       }
     },
@@ -67,9 +89,12 @@ function Task({task}: TaskProps) {
   }));
 
   const rIconContainerStyle = useAnimatedStyle(() => {
-    const iconOpacity = withTiming(
-      -translateX.value > windowWidth * 0.3 ? 1 : 0,
-    );
+    let iconOpacity;
+    if (translateX.value < 0) {
+      iconOpacity = withTiming(-translateX.value > windowWidth * 0.3 ? 1 : 0);
+    } else {
+      iconOpacity = withTiming(translateX.value > windowWidth * 0.3 ? 1 : 0);
+    }
     return {opacity: iconOpacity};
   });
 
@@ -97,8 +122,21 @@ function Task({task}: TaskProps) {
 
   return (
     <Animated.View style={[styles.container, rContainerStyle]}>
-      <Animated.View style={[styles.iconContainer, rIconContainerStyle]}>
+      <Animated.View
+        style={[
+          styles.iconContainer,
+          styles.deleteIconContainer,
+          rIconContainerStyle,
+        ]}>
         <Icon name="delete" size={32} color="red" />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.iconContainer,
+          styles.completeIconContainer,
+          rIconContainerStyle,
+        ]}>
+        <Icon name="check" size={32} color="green" />
       </Animated.View>
       <PanGestureHandler onGestureEvent={panGesture}>
         <Animated.View style={[styles.taskContainer, rStyle]}>
@@ -106,7 +144,7 @@ function Task({task}: TaskProps) {
             <TaskForm handler={onUpdateTask} inputText={task.text} />
           ) : (
             <View style={styles.task}>
-              <Text style={styles.text}>{task.text}</Text>
+              <Text style={textStyles}>{task.text}</Text>
               <Pressable onPress={onPress}>
                 <Icon name="edit-2" size={16} />
               </Pressable>
@@ -137,10 +175,15 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   iconContainer: {
-    position: 'absolute',
-    right: 20,
     top: '35%',
     alignSelf: 'baseline',
+    position: 'absolute',
+  },
+  deleteIconContainer: {
+    right: 20,
+  },
+  completeIconContainer: {
+    left: 20,
   },
   task: {
     flexDirection: 'row',
@@ -150,6 +193,9 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     maxWidth: '80%',
+  },
+  completedText: {
+    textDecorationLine: 'line-through',
   },
 });
 

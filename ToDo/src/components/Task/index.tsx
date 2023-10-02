@@ -69,7 +69,7 @@ function Task({task}: TaskProps) {
         }
       } else {
         if (event.translationX > windowWidth * 0.3) {
-          opacity.value = withTiming(0, undefined, isFinished => {
+          opacity.value = withTiming(1, undefined, isFinished => {
             if (isFinished) {
               runOnJS(onComplete)();
             }

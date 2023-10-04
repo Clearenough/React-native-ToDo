@@ -1,4 +1,4 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createSlice, nanoid, PayloadAction} from '@reduxjs/toolkit';
 import {ITask, TasksState} from '../../types/common';
 
 const initialState: TasksState = [
@@ -13,8 +13,19 @@ export const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    addTask: (state: TasksState, action: PayloadAction<ITask>) => {
-      state.push(action.payload);
+    addTask: {
+      reducer: (state: TasksState, action: PayloadAction<ITask>) => {
+        state.push(action.payload);
+      },
+      prepare: (text: string) => {
+        return {
+          payload: {
+            id: nanoid(),
+            text,
+            isCompleted: false,
+          },
+        };
+      },
     },
     deleteTask: (state: TasksState, action: PayloadAction<string>) => {
       const id = action.payload;

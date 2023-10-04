@@ -63,7 +63,7 @@ function TaskForm({handler, inputText}: TaskFormProps) {
       ]}>
       <TextInput
         placeholder="To Do"
-        onChangeText={newText => setText(newText)}
+        onChangeText={setText}
         defaultValue={text}
         style={[styles.input]}
         keyboardType="ascii-capable"

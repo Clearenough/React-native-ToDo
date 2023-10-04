@@ -7,10 +7,11 @@ import {
   View,
 } from 'react-native';
 import {useAppSelector} from '../../hooks/hooks';
+import {selectTasks} from '../../store/slices/tasksSlice';
 import Task from '../Task';
 
 function Tasks() {
-  const tasks = useAppSelector(state => state.tasks);
+  const tasks = useAppSelector(selectTasks);
 
   return (
     <View style={styles.container}>

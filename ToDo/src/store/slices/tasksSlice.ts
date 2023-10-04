@@ -1,5 +1,6 @@
 import {createSlice, nanoid, PayloadAction} from '@reduxjs/toolkit';
 import {ITask, TasksState} from '../../types/common';
+import {RootState} from '../store';
 
 const initialState: TasksState = [
   {
@@ -48,6 +49,8 @@ export const tasksSlice = createSlice({
     },
   },
 });
+
+export const selectTasks = (state: RootState) => state.tasks;
 
 export const {addTask, deleteTask, updateTask, completeTask} =
   tasksSlice.actions;

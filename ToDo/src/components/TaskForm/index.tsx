@@ -18,23 +18,48 @@ function TaskForm({handler, inputText}: TaskFormProps) {
   });
 
   const focusAnim = useRef(new Animated.Value(0.05)).current;
+  const iconOpacity = useRef(new Animated.Value(0)).current;
 
   const backgroundColor = focusAnim.interpolate({
-    inputRange: [0.05, 0.2], // Map 0.05 to 0 and 0.4 to 1
-    outputRange: ['rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0.2)'], // Transparent to opaque
+    inputRange: [0.05, 0.2],
+    outputRange: ['rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0.2)'],
+  });
+
+  const opacity = iconOpacity.interpolate({
+    inputRange: [0.05, 0.4],
+    outputRange: [0, 1],
   });
 
   // useEffect(() => {
-  //   Animated.timing(focusAnim, {
-  //     toValue: 0.2,
+  //   Animated.timing(iconOpacity, {
+  //     toValue: 1,
   //     duration: 200,
   //     useNativeDriver: true,
   //   }).start();
-  // }, [focusAnim, isFocused]);
+  // }, [iconOpacity]);
 
-  function onPress() {
+  function onAdd() {
     handler(text);
     setText('');
+  }
+
+  function onClear() {
+    setText('');
+    Animated.timing(iconOpacity, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }
+
+  function onChangeText(textInputValue: string) {
+    Animated.timing(iconOpacity, {
+      toValue: textInputValue ? 1 : 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+
+    setText(textInputValue);
   }
 
   function onFocus() {
@@ -63,7 +88,7 @@ function TaskForm({handler, inputText}: TaskFormProps) {
       ]}>
       <TextInput
         placeholder="To Do"
-        onChangeText={setText}
+        onChangeText={onChangeText}
         defaultValue={text}
         style={[styles.input]}
         keyboardType="ascii-capable"
@@ -76,9 +101,19 @@ function TaskForm({handler, inputText}: TaskFormProps) {
           onBlur();
         }}
       />
-      <Pressable onPress={onPress}>
-        <Icon name="plus" size={16} />
-      </Pressable>
+      <View style={styles.iconsContainer}>
+        <Animated.View
+          style={{
+            opacity,
+          }}>
+          <Pressable onPress={onClear}>
+            <Icon name="delete" size={16} />
+          </Pressable>
+        </Animated.View>
+        <Pressable onPress={onAdd}>
+          <Icon name="plus" size={16} />
+        </Pressable>
+      </View>
     </Animated.View>
   );
 }
@@ -91,6 +126,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     border: 1,
     padding: 10,
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+    gap: 10,
   },
   input: {
     fontSize: 16,

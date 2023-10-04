@@ -1,4 +1,3 @@
-import {nanoid} from '@reduxjs/toolkit';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useAppDispatch} from '../../hooks/hooks';
@@ -9,13 +8,7 @@ function Header() {
   const dispatch = useAppDispatch();
 
   function onCreate(text: string) {
-    dispatch(
-      addTask({
-        id: nanoid(),
-        isCompleted: false,
-        text,
-      }),
-    );
+    dispatch(addTask(text));
   }
 
   return (

@@ -1,5 +1,6 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createSlice, nanoid, PayloadAction} from '@reduxjs/toolkit';
 import {ITask, TasksState} from '../../types/common';
+import {RootState} from '../store';
 
 const initialState: TasksState = [
   {
@@ -13,13 +14,25 @@ export const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    addTask: (state: TasksState, action: PayloadAction<ITask>) => {
-      state.push(action.payload);
+    addTask: {
+      reducer: (state: TasksState, action: PayloadAction<ITask>) => {
+        state.push(action.payload);
+      },
+      prepare: (text: string) => {
+        return {
+          payload: {
+            id: nanoid(),
+            text,
+            isCompleted: false,
+          },
+        };
+      },
     },
     deleteTask: (state: TasksState, action: PayloadAction<string>) => {
       const id = action.payload;
-      const index = state.findIndex(task => task.id === id);
-      state.splice(index, 1);
+      // const index = state.findIndex(task => task.id === id);
+      // state.splice(index, 1);
+      state.filter(task => task.id !== id);
     },
     updateTask: (state: TasksState, action: PayloadAction<ITask>) => {
       const {id, text} = action.payload;
@@ -37,6 +50,8 @@ export const tasksSlice = createSlice({
     },
   },
 });
+
+export const selectTasks = (state: RootState) => state.tasks;
 
 export const {addTask, deleteTask, updateTask, completeTask} =
   tasksSlice.actions;

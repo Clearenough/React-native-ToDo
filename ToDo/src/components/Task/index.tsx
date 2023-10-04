@@ -1,5 +1,11 @@
 import React, {useState} from 'react';
-import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import {ITask} from '../../types/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {useAppDispatch} from '../../hooks/hooks';
@@ -26,11 +32,11 @@ interface TaskProps {
   task: ITask;
 }
 
-const windowWidth = Dimensions.get('window').width;
-
 function Task({task}: TaskProps) {
   const [isUpdateTask, setIsUpdateTask] = useState(false);
   const dispatch = useAppDispatch();
+
+  const {width: windowWidth} = useWindowDimensions();
 
   const translateX = useSharedValue(0);
   const height = useSharedValue(60);
@@ -69,7 +75,7 @@ function Task({task}: TaskProps) {
         }
       } else {
         if (event.translationX > windowWidth * 0.3) {
-          opacity.value = withTiming(0, undefined, isFinished => {
+          opacity.value = withTiming(1, undefined, isFinished => {
             if (isFinished) {
               runOnJS(onComplete)();
             }

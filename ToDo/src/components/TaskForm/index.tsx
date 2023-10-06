@@ -1,6 +1,12 @@
-import React, {useEffect, useRef} from 'react';
+import React from 'react';
 import {useState} from 'react';
-import {Animated, Pressable, StyleSheet, TextInput, View} from 'react-native';
+import {Pressable, StyleSheet, TextInput, View} from 'react-native';
+import Animated, {runOnJS, withTiming} from 'react-native-reanimated';
+import {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 interface TaskFormProps {
@@ -17,68 +23,82 @@ function TaskForm({handler, inputText}: TaskFormProps) {
     return '';
   });
 
-  const focusAnim = useRef(new Animated.Value(0.05)).current;
+  const inputBackgroundColor = useSharedValue(0.05);
+  const iconOpacity = useSharedValue(0);
 
-  const backgroundColor = focusAnim.interpolate({
-    inputRange: [0.05, 0.2], // Map 0.05 to 0 and 0.4 to 1
-    outputRange: ['rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0.2)'], // Transparent to opaque
+  const backgroundColor = useAnimatedStyle(() => {
+    return {
+      backgroundColor: `rgba(0,0,0, ${inputBackgroundColor.value})`,
+    };
   });
 
-  // useEffect(() => {
-  //   Animated.timing(focusAnim, {
-  //     toValue: 0.2,
-  //     duration: 200,
-  //     useNativeDriver: true,
-  //   }).start();
-  // }, [focusAnim, isFocused]);
+  const opacity = useAnimatedStyle(() => {
+    return {
+      opacity: iconOpacity.value,
+    };
+  });
 
-  function onPress() {
+  function onAdd() {
     handler(text);
     setText('');
   }
 
+  function onClear() {
+    iconOpacity.value = withTiming(0, {duration: 300});
+    setText('');
+  }
+
+  function onChangeText(inputValue: string) {
+    setText(inputValue);
+    if (inputValue) {
+      iconOpacity.value = withTiming(1, {duration: 300});
+      return null;
+    }
+    iconOpacity.value = withTiming(0, {duration: 300});
+  }
+
+  function changeIsFocused() {
+    setIsFocused(value => !value);
+  }
+
   function onFocus() {
-    Animated.timing(focusAnim, {
-      toValue: 0.2,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
+    inputBackgroundColor.value = withTiming(0.2, {duration: 300}, () => {
+      runOnJS(changeIsFocused)();
+    });
   }
 
   function onBlur() {
-    Animated.timing(focusAnim, {
-      toValue: 0.05,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
+    inputBackgroundColor.value = withTiming(0.05, {duration: 300}, () => {
+      runOnJS(changeIsFocused)();
+    });
   }
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          backgroundColor,
-        },
-      ]}>
+    <Animated.View style={[styles.container, backgroundColor]}>
       <TextInput
         placeholder="To Do"
-        onChangeText={setText}
+        onChangeText={onChangeText}
         defaultValue={text}
         style={[styles.input]}
         keyboardType="ascii-capable"
         onFocus={() => {
-          setIsFocused(true);
           onFocus();
         }}
         onBlur={() => {
-          setIsFocused(false);
           onBlur();
         }}
       />
-      <Pressable onPress={onPress}>
-        <Icon name="plus" size={16} />
-      </Pressable>
+      <View style={styles.iconsContainer}>
+        <Animated.View style={opacity}>
+          <Pressable onPress={onClear}>
+            <Icon name="delete" size={16} />
+          </Pressable>
+        </Animated.View>
+
+        <Pressable onPress={onAdd}>
+          <Icon name="plus" size={16} />
+        </Pressable>
+      </View>
     </Animated.View>
   );
 }
@@ -91,6 +111,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     border: 1,
     padding: 10,
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+    gap: 10,
   },
   input: {
     fontSize: 16,

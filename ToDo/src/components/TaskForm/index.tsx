@@ -2,11 +2,7 @@ import React from 'react';
 import {useState} from 'react';
 import {Pressable, StyleSheet, TextInput, View} from 'react-native';
 import Animated, {runOnJS, withTiming} from 'react-native-reanimated';
-import {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
+import {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 interface TaskFormProps {
@@ -15,7 +11,7 @@ interface TaskFormProps {
 }
 
 function TaskForm({handler, inputText}: TaskFormProps) {
-  const [isFocused, setIsFocused] = useState(false);
+  const [_, setIsFocused] = useState(false);
   const [text, setText] = useState(() => {
     if (inputText) {
       return inputText;

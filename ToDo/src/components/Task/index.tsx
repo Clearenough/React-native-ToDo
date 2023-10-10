@@ -26,7 +26,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {Dimensions} from 'react-native';
 
 interface TaskProps {
   task: ITask;
